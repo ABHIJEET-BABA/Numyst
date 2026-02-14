@@ -3,7 +3,9 @@ import { GoogleGenAI } from "@google/genai";
 import { PRODUCTS } from "../constants";
 
 const getAIClient = () => {
-  return new GoogleGenAI({ apiKey: process.env.API_KEY });
+  // Safe check for API_KEY to prevent startup crash
+  const apiKey = process.env.API_KEY || (window as any).process?.env?.API_KEY;
+  return new GoogleGenAI({ apiKey: apiKey });
 };
 
 export const getPerfumeRecommendation = async (userQuery: string, imageData?: string): Promise<string> => {
@@ -16,16 +18,17 @@ export const getPerfumeRecommendation = async (userQuery: string, imageData?: st
     You are 'Ora', the Soul-Scent Visionary for Numyst. 
     
     YOUR MANDATE:
-    1. READ THE VIBE: Identify the customer's mood, energy, and "vibe" from their words or images.
-    2. BE MULTIMODAL: If an image is provided, analyze its colors, textures, and mood.
-    3. TACKLE ALL QUESTIONS: Respond to ANY query. If it's not about perfume, relate it back to a scent. 
-    4. RECOMMENDATION: Always connect the vibe to one of our masterworks: ce-lest, miRge, shadOw, cRush, or El3ment.
-    5. VOICE: Elegant, intuitive, and deeply rooted in Indian luxury.
-    6. FORMAT: ALWAYS respond in concise bullet points. 
-       - Use 3 to 4 bullet points maximum.
-       - Keep sentences short and graspable.
-       - Avoid long blocks of text.
-       - Make the answer easy to read in under 10 seconds.
+    1. READ THE VIBE: Identify mood and energy instantly.
+    2. BE CONCISE: Use exactly 3 to 4 short bullet points.
+    3. NO PARAGRAPHS: People should grasp the answer in 5 seconds.
+    4. LUXURY TONE: Poetic but extremely direct.
+    5. RECOMMEND: Always pick one: ce-lest, miRge, shadOw, cRush, or El3ment.
+
+    REPLY FORMAT:
+    • [Observation about their vibe]
+    • [Scent recommendation]
+    • [Key note highlight]
+    • [One poetic parting thought]
     
     CATALOG:
     ${productContext}
@@ -52,7 +55,7 @@ export const getPerfumeRecommendation = async (userQuery: string, imageData?: st
     return response.text || "• Sensing a shift in the air.\n• Tell me more of your vibe.\n• I am here to guide you.";
   } catch (error) {
     console.error("Ora Connection Error:", error);
-    return "• Intuition remains clear.\n• The incense is thick.\n• What feeling do you wish to capture?";
+    return "• System connection is light.\n• Check your environment keys.\n• I am ready when you are.";
   }
 };
 

@@ -1,0 +1,7 @@
+{
+  "name": "Numyst - Essence of India",
+  "description": "A luxury e-commerce experience for Numyst, an artisanal Indian perfume brand. Features a complete shopping journey from discovery to checkout, powered by an AI Fragrance Consultant.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

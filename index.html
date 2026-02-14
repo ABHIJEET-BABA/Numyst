@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Numyst | Luxury Indian Perfumery</title>
-    <!-- Add process polyfill for static hosting -->
+    <!-- Critical: Polyfill for process.env to prevent crashes in production/static environments -->
     <script>
       window.process = { env: { API_KEY: "" } };
     </script>
@@ -20,14 +20,14 @@
                 200: '#F0DEAA',
                 300: '#E6CB7D',
                 400: '#DDB850',
-                500: '#D4A523', // Primary Brand Gold
+                500: '#D4A523',
                 600: '#AA841C',
                 700: '#806315',
                 800: '#55420E',
                 900: '#2B2107',
               },
               mysore: {
-                900: '#1a1818', // Deep Black/Brown
+                900: '#1a1818',
                 800: '#2a2626',
               }
             },
@@ -54,21 +54,22 @@
       };
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
-  <script type="importmap">
-{
-  "imports": {
-    "@google/genai": "https://esm.sh/@google/genai@^1.41.0",
-    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
-    "react-router-dom": "https://esm.sh/react-router-dom@^7.13.0",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
-    "react/": "https://esm.sh/react@^19.2.4/",
-    "react": "https://esm.sh/react@^19.2.4"
-  }
-}
-</script>
-</head>
+    <script type="importmap">
+    {
+      "imports": {
+        "@google/genai": "https://esm.sh/@google/genai@^1.41.0",
+        "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+        "react-router-dom": "https://esm.sh/react-router-dom@^7.13.0",
+        "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+        "react/": "https://esm.sh/react@^19.2.4/",
+        "react": "https://esm.sh/react@^19.2.4"
+      }
+    }
+    </script>
+  </head>
   <body class="bg-mysore-900 text-stone-200 antialiased selection:bg-gold-500 selection:text-mysore-900">
     <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
+    <!-- Fixed: Use relative path for index.tsx to support subfolder deployments like GitHub Pages -->
+    <script type="module" src="index.tsx"></script>
   </body>
 </html>

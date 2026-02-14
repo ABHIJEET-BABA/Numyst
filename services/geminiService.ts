@@ -3,7 +3,6 @@ import { GoogleGenAI } from "@google/genai";
 import { PRODUCTS } from "../constants";
 
 const getAIClient = () => {
-  // Safe check for API_KEY to prevent startup crash
   const apiKey = process.env.API_KEY || (window as any).process?.env?.API_KEY;
   return new GoogleGenAI({ apiKey: apiKey });
 };
@@ -15,20 +14,18 @@ export const getPerfumeRecommendation = async (userQuery: string, imageData?: st
   ).join('\n');
 
   const systemInstruction = `
-    You are 'Ora', the Soul-Scent Visionary for Numyst. 
+    You are 'Ora', the Soul-Scent Visionary for Numyst.
     
-    YOUR MANDATE:
-    1. READ THE VIBE: Identify mood and energy instantly.
-    2. BE CONCISE: Use exactly 3 to 4 short bullet points.
-    3. NO PARAGRAPHS: People should grasp the answer in 5 seconds.
-    4. LUXURY TONE: Poetic but extremely direct.
-    5. RECOMMEND: Always pick one: ce-lest, miRge, shadOw, cRush, or El3ment.
+    RULES:
+    1. EXTREME BREVITY: Max 2-3 bullet points. No paragraphs.
+    2. DIRECT: Answer quickly. One sentence per bullet.
+    3. BRAND: Poetic luxury.
+    4. MUST RECOMMEND: ce-lest, miRge, shadOw, cRush, or El3ment.
 
-    REPLY FORMAT:
-    • [Observation about their vibe]
-    • [Scent recommendation]
-    • [Key note highlight]
-    • [One poetic parting thought]
+    FORMAT:
+    • [Direct observation of the user's mood]
+    • [Clear scent recommendation & why]
+    • [A brief poetic parting thought]
     
     CATALOG:
     ${productContext}
@@ -36,13 +33,9 @@ export const getPerfumeRecommendation = async (userQuery: string, imageData?: st
 
   try {
     const parts: any[] = [{ text: userQuery }];
-    
     if (imageData) {
       parts.push({
-        inlineData: {
-          data: imageData.split(',')[1],
-          mimeType: 'image/jpeg'
-        }
+        inlineData: { data: imageData.split(',')[1], mimeType: 'image/jpeg' }
       });
     }
 
@@ -52,40 +45,31 @@ export const getPerfumeRecommendation = async (userQuery: string, imageData?: st
       config: { systemInstruction }
     });
     
-    return response.text || "• Sensing a shift in the air.\n• Tell me more of your vibe.\n• I am here to guide you.";
+    return response.text || "• Sensing a shift.\n• Explore the collection.\n• Breath deeply.";
   } catch (error) {
-    console.error("Ora Connection Error:", error);
-    return "• System connection is light.\n• Check your environment keys.\n• I am ready when you are.";
+    return "• System is quiet.\n• Check your keys.\n• I am here.";
   }
 };
 
 export const analyzeMoodAndRecommend = async (imageData: string, textPrompt: string): Promise<{ recommendation: string, productName: string }> => {
   const client = getAIClient();
   const productContext = PRODUCTS.map(p => `${p.name}: ${p.tagline}`).join('\n');
-
   try {
     const response = await client.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: {
         parts: [
           { inlineData: { data: imageData.split(',')[1], mimeType: 'image/jpeg' } },
-          { text: `As Ora, analyze the 'vibe' of this image. Combine it with the user's intent: "${textPrompt}". 
-          Recommend ONE scent from: ${productContext}. 
-          
-          Format:
-          NAME: [Exact Product Name]
-          REASON: [A poetic justification in one short sentence]` }
+          { text: `Analyze vibe: "${textPrompt}". Pick ONE from: ${productContext}. Format: NAME: [Name] REASON: [One short sentence]` }
         ]
       }
     });
-
     const text = response.text || "";
     const nameMatch = text.match(/NAME:\s*(.*)/i);
     const reasonMatch = text.match(/REASON:\s*(.*)/i);
-
     return {
       productName: nameMatch ? nameMatch[1].trim() : PRODUCTS[0].name,
-      recommendation: reasonMatch ? reasonMatch[1].trim() : "This visual energy aligns with our most grounding essence."
+      recommendation: reasonMatch ? reasonMatch[1].trim() : "Aligned with our core essence."
     };
   } catch (error) {
     return { productName: PRODUCTS[0].name, recommendation: "The stars align for this choice." };
@@ -98,13 +82,10 @@ export const generateScentVisual = async (productName: string, mood: string): Pr
     const response = await client.models.generateContent({
       model: 'gemini-2.5-flash-image',
       contents: {
-        parts: [
-          { text: `A cinematic, ultra-luxury perfume editorial for "${productName}". Style: Modern Indian Elegance. Mood: ${mood}. 8k resolution.` }
-        ]
+        parts: [{ text: `Luxury perfume editorial: "${productName}". Mood: ${mood}.` }]
       },
       config: { imageConfig: { aspectRatio: "1:1" } }
     });
-
     for (const part of response.candidates[0].content.parts) {
       if (part.inlineData) return `data:image/png;base64,${part.inlineData.data}`;
     }
